@@ -1,0 +1,179 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "1.1",
+    "title" : "EsTextAnalytics REST API Documentation"
+  },
+  "host" : "api.textanalytics.linkeddata.es",
+  "basePath" : "/esTARestAPI/rest",
+  "tags" : [ {
+    "name" : "RDF Catalog Service",
+    "description" : "Requesting catalog with available EsDBpedia datasets"
+  }, {
+    "name" : "RDF Service",
+    "description" : "API Operations to work with available catalog EsDBpedia datasets"
+  } ],
+  "schemes" : [ "http" ],
+  "paths" : {
+    "/RDFCatalogService/rdfcatalog" : {
+      "get" : {
+        "tags" : [ "RDF Catalog Service" ],
+        "summary" : "Get RDF Catalog",
+        "description" : "Get RDF Catalog, returns list with available datasets",
+        "operationId" : "getUsers",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "type" : "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/RDFService/rdf/downloadhttp/{id}/resume/{n_offset_bytes}" : {
+      "get" : {
+        "tags" : [ "RDF Service" ],
+        "summary" : "download RDF via http",
+        "description" : "download RDF via http, starting from a particular byte",
+        "operationId" : "doGet",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Id referenced to RDF requested previosly",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "n_offset_bytes",
+          "in" : "path",
+          "description" : "offset to request RDF and its byte where should continue",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "successful operation"
+          }
+        }
+      }
+    },
+    "/RDFService/rdf/{id}" : {
+      "get" : {
+        "tags" : [ "RDF Service" ],
+        "summary" : "Get RDF data by id",
+        "description" : "Get RDF data by id, returns operation response in json format",
+        "operationId" : "getRdf",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Id referenced to RDF requested",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/RDFDownload"
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "RDF Service" ],
+        "summary" : "Delete RDF data by id",
+        "description" : "Delete RDF data by id, returns operation response in json format",
+        "operationId" : "deleteRdf",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Id referenced to RDF requested to be deleted",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/RDFDownload"
+            }
+          }
+        }
+      }
+    },
+    "/RDFService/rdf" : {
+      "put" : {
+        "tags" : [ "RDF Service" ],
+        "summary" : "Generate RDF",
+        "description" : "Generate RDF following available catalog datasets, returns operation response in json format",
+        "operationId" : "putRdf",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "description" : "String in json format requesting what rdf from catalog should be merged ",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/RDFDownload"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "FTPCon" : {
+      "type" : "object",
+      "properties" : {
+        "port" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "url" : {
+          "type" : "string"
+        },
+        "user" : {
+          "type" : "string"
+        },
+        "pass" : {
+          "type" : "string"
+        }
+      }
+    },
+    "RDFDownload" : {
+      "type" : "object",
+      "properties" : {
+        "status" : {
+          "type" : "string",
+          "enum" : [ "OK", "CREATED", "PROCESSING", "DELETED", "UNEXPECTED", "ERROR" ]
+        },
+        "connection" : {
+          "$ref" : "#/definitions/FTPCon"
+        },
+        "message" : {
+          "type" : "string"
+        },
+        "dataid" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}
